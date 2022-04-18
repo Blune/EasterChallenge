@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>artiso Coding Challenge: Coden für den Osterhasen!</title>
+    <meta name="author" content="Matthias Abele">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="chartContainer">
+        <div class="dataTitle"><span class="iconify" data-icon="jam:temperature"></span>Temperatur [°C]</div>
+        <canvas id="temperature"></canvas>
+    </div>
+    <div class="chartContainer">
+        <div class="dataTitle"><span class="iconify" data-icon="iwwa:humidity"></span>Luftfeuchtigkeit [%]</div>
+        <canvas id="humidity"></canvas>
+    </div>
+    <div class="chartContainer">
+        <div class="dataTitle"><span class="iconify" data-icon="ic:outline-air"></span>PM2.5 [µm/m³]</div>
+        <canvas id="P1"></canvas>
+    </div>
+    <div class="chartContainer">
+        <div class="dataTitle"><span class="iconify" data-icon="ic:outline-air"></span>PM10 [µm/m³]</div>
+        <canvas id="P2"></canvas>
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+<script src="script.js"></script>
+
+</html>
