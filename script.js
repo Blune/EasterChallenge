@@ -3,7 +3,7 @@ dateAndTempetarure = new Map();
 dateAndP1 = new Map();
 dateAndP2 = new Map();
 
-Chart.defaults.global.defaultFontColor = "#fff";
+Chart.defaults.defaultFontColor = "#fff";
 refreshEvery65Seconds();
 
 function refreshEvery65Seconds() {
@@ -16,20 +16,20 @@ function fetchAndDisplayData() {
         .then(r => r.json())
         .then(response => {
             addToPreviousData(dateAndTempetarure, getDateAndValue(response, "temperature"));
-            drawChart("temperature", Array.from(dateAndTempetarure.keys()), Array.from(dateAndTempetarure.values()));
+            drawChart("temperature", [...dateAndTempetarure.keys()], [...dateAndTempetarure.values()], 10, 20);
 
             addToPreviousData(dateAndHumidity, getDateAndValue(response, "humidity"));
-            drawChart("humidity", Array.from(dateAndHumidity.keys()), Array.from(dateAndHumidity.values()));
+            drawChart("humidity", [...dateAndHumidity.keys()], [...dateAndHumidity.values()], 60, 70);
         });
 
     obj = fetch('https://data.sensor.community/airrohr/v1/sensor/71550/')
         .then(r => r.json())
         .then(response => {
             addToPreviousData(dateAndP1, getDateAndValue(response, "P1"));
-            drawChart("P1", Array.from(dateAndP1.keys()), Array.from(dateAndP1.values()));
+            drawChart("P1", [...dateAndP1.keys()], [...dateAndP1.values()], 2, 15);
 
             addToPreviousData(dateAndP2, getDateAndValue(response, "P2"));
-            drawChart("P2", Array.from(dateAndP2.keys()), Array.from(dateAndP2.values()));
+            drawChart("P2", [...dateAndP2.keys()], [...dateAndP2.values()], 2, 15);
         });
 }
 
@@ -62,7 +62,7 @@ function getSensorData(response, name) {
         .reverse();
 }
 
-function drawChart(name, labels, data) {
+function drawChart(name, labels, data, min, max) {
 
     new Chart(document.getElementById(name), {
         type: 'line',
@@ -71,24 +71,19 @@ function drawChart(name, labels, data) {
             datasets: [{
                 data: data,
                 borderColor: "#F39325",
-                fill: false
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            legend: {
-                display: false
-            },
-            tooltips: {
-                callbacks: {
-                    label: function (tooltipItem) {
-                        return tooltipItem.yLabel;
-                    }
+            scales: {
+                y: {
+                    suggestedMin: min,
+                    suggestedMax: max
                 }
-            },
-            title: {
-                display: false
+            },                
+            plugins:{
+                legend: {
+                    display: false
+                }
             }
         }
     });
