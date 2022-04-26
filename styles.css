@@ -10,13 +10,6 @@ body {
     background-color: #202124;
 }
 
-canvas {
-    padding: 0;
-    margin: auto;
-    display: block;
-    margin-bottom: 20px;
-}
-
 .dataTitle {
     background-color: #F39325;
     height: 60px;
@@ -28,7 +21,8 @@ canvas {
 }
 
 .chartContainer{
-    margin-bottom: 50px;
+    margin: auto auto 100px auto;
+    height: 18vh; 
 }
 
 .title {

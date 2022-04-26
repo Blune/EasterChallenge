@@ -74,6 +74,7 @@ function drawChart(name, labels, data, min, max) {
             }]
         },
         options: {
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     suggestedMin: min,
