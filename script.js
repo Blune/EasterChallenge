@@ -3,6 +3,11 @@ dateAndTempetarure = new Map();
 dateAndP1 = new Map();
 dateAndP2 = new Map();
 
+chartTemperature = null;
+chartHumidity = null;
+chartP1 = null;
+chartP2 = null;
+
 Chart.defaults.defaultFontColor = "#fff";
 refreshEvery65Seconds();
 
@@ -16,20 +21,24 @@ function fetchAndDisplayData() {
         .then(r => r.json())
         .then(response => {
             addToPreviousData(dateAndTempetarure, getDateAndValue(response, "temperature"));
-            drawChart("temperature", [...dateAndTempetarure.keys()], [...dateAndTempetarure.values()], 10, 20);
+            if(!chartTemperature) chartTemperature = drawChart("temperature", [...dateAndTempetarure.keys()], [...dateAndTempetarure.values()], 15, 25);
+            else updateChart(chartTemperature, [...dateAndTempetarure].pop())
 
             addToPreviousData(dateAndHumidity, getDateAndValue(response, "humidity"));
-            drawChart("humidity", [...dateAndHumidity.keys()], [...dateAndHumidity.values()], 60, 70);
+            if(!chartHumidity) chartHumidity = drawChart("humidity", [...dateAndHumidity.keys()], [...dateAndHumidity.values()], 60, 80);
+            else updateChart(chartHumidity, [...dateAndHumidity].pop())
         });
 
     obj = fetch('https://data.sensor.community/airrohr/v1/sensor/71550/')
         .then(r => r.json())
         .then(response => {
             addToPreviousData(dateAndP1, getDateAndValue(response, "P1"));
-            drawChart("P1", [...dateAndP1.keys()], [...dateAndP1.values()], 2, 15);
+            if(!chartP1) chartP1 = drawChart("P1", [...dateAndP1.keys()], [...dateAndP1.values()], 2, 15);
+            else updateChart(chartP1, [...dateAndP1].pop())
 
             addToPreviousData(dateAndP2, getDateAndValue(response, "P2"));
-            drawChart("P2", [...dateAndP2.keys()], [...dateAndP2.values()], 2, 15);
+            if(!chartP2) chartP1 = drawChart("P2", [...dateAndP2.keys()], [...dateAndP2.values()], 2, 15);
+            else updateChart(chartP2, [...dateAndP2].pop())
         });
 }
 
@@ -62,9 +71,16 @@ function getSensorData(response, name) {
         .reverse();
 }
 
-function drawChart(name, labels, data, min, max) {
+function updateChart(chart, [key, value]){
+    chart.data.labels.push(key);
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(value);
+    });
+    chart.update();
+}
 
-    new Chart(document.getElementById(name), {
+function drawChart(name, labels, data, min, max) {
+    return new Chart(document.getElementById(name), {
         type: 'line',
         data: {
             labels: labels,
@@ -77,6 +93,7 @@ function drawChart(name, labels, data, min, max) {
             maintainAspectRatio: false,
             scales: {
                 y: {
+                    stacked: true,
                     suggestedMin: min,
                     suggestedMax: max
                 }
