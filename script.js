@@ -8,7 +8,6 @@ chartHumidity = null;
 chartP1 = null;
 chartP2 = null;
 
-Chart.defaults.defaultFontColor = "#fff";
 refreshEvery65Seconds();
 
 function refreshEvery65Seconds() {
@@ -17,28 +16,35 @@ function refreshEvery65Seconds() {
 }
 
 function fetchAndDisplayData() {
-    obj = fetch('https://data.sensor.community/airrohr/v1/sensor/71551/')
+    fetch('https://data.sensor.community/airrohr/v1/sensor/71551/')
         .then(r => r.json())
         .then(response => {
             addToPreviousData(dateAndTempetarure, getDateAndValue(response, "temperature"));
-            if(!chartTemperature) chartTemperature = drawChart("temperature", [...dateAndTempetarure.keys()], [...dateAndTempetarure.values()], 15, 25);
-            else updateChart(chartTemperature, [...dateAndTempetarure].pop())
-
             addToPreviousData(dateAndHumidity, getDateAndValue(response, "humidity"));
-            if(!chartHumidity) chartHumidity = drawChart("humidity", [...dateAndHumidity.keys()], [...dateAndHumidity.values()], 60, 80);
-            else updateChart(chartHumidity, [...dateAndHumidity].pop())
+        }).then(() =>{
+            chartTemperature == null 
+            ? chartTemperature = drawChart("temperature", dateAndTempetarure, 15, 25)
+            : updateChart(chartTemperature, [...dateAndTempetarure].pop())
+
+            chartHumidity == null 
+            ? chartHumidity = drawChart("humidity", dateAndHumidity, 60, 80) 
+            : updateChart(chartHumidity, [...dateAndHumidity].pop())
         });
 
-    obj = fetch('https://data.sensor.community/airrohr/v1/sensor/71550/')
+    fetch('https://data.sensor.community/airrohr/v1/sensor/71550/')
         .then(r => r.json())
         .then(response => {
             addToPreviousData(dateAndP1, getDateAndValue(response, "P1"));
-            if(!chartP1) chartP1 = drawChart("P1", [...dateAndP1.keys()], [...dateAndP1.values()], 2, 15);
-            else updateChart(chartP1, [...dateAndP1].pop())
-
             addToPreviousData(dateAndP2, getDateAndValue(response, "P2"));
-            if(!chartP2) chartP1 = drawChart("P2", [...dateAndP2.keys()], [...dateAndP2.values()], 2, 15);
-            else updateChart(chartP2, [...dateAndP2].pop())
+        })
+        .then(() => {
+            chartP1 == null 
+            ? chartP1 = drawChart("P1", dateAndP1, 2, 15)
+            : updateChart(chartP1, [...dateAndP1].pop())
+
+            chartP2 == null 
+            ? chartP2 = drawChart("P2", dateAndP2, 2, 15)
+            : updateChart(chartP2, [...dateAndP2].pop())
         });
 }
 
@@ -47,13 +53,12 @@ function addToPreviousData(previousData, newData) {
 }
 
 function getDateAndValue(response, valueName) {
-    dict = new Map();
+    map = new Map();
     dates = getDates(response);
     data = getSensorData(response, valueName);
-    for (var i = 0; i < dates.length; i++) {
-        dict.set(dates[i], data[i]);
-    }
-    return dict;
+    for (var i = 0; i < dates.length; i++) 
+        map.set(dates[i], data[i]);
+    return map;
 }
 
 function getDates(response) {
@@ -79,21 +84,21 @@ function updateChart(chart, [key, value]){
     chart.update();
 }
 
-function drawChart(name, labels, data, min, max) {
+function drawChart(name, datesAndValues, min, max) {
     return new Chart(document.getElementById(name), {
         type: 'line',
         data: {
-            labels: labels,
+            labels: [...datesAndValues.keys()],
             datasets: [{
-                data: data,
+                data: [...datesAndValues.values()],
                 borderColor: "#F39325",
+                color: "#fff"
             }]
         },
         options: {
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    stacked: true,
                     suggestedMin: min,
                     suggestedMax: max
                 }
