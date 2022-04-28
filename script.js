@@ -1,5 +1,5 @@
 dateAndHumidity = new Map();
-dateAndTempetarure = new Map();
+dateAndTemperature = new Map();
 dateAndP1 = new Map();
 dateAndP2 = new Map();
 
@@ -10,42 +10,52 @@ chartP2 = null;
 
 refreshEvery65Seconds();
 
-function refreshEvery65Seconds() {
-    fetchAndDisplayData();
+async function refreshEvery65Seconds() {
+    await fetchData();
+    chartTemperature == null ? drawCharts() : updateCharts();
     setTimeout(refreshEvery65Seconds, 65000);
 }
 
-function fetchAndDisplayData() {
-    fetch('https://data.sensor.community/airrohr/v1/sensor/71551/')
-        .then(r => r.json())
-        .then(response => {
-            addToPreviousData(dateAndTempetarure, getDateAndValue(response, "temperature"));
-            addToPreviousData(dateAndHumidity, getDateAndValue(response, "humidity"));
-        }).then(() =>{
-            chartTemperature == null 
-            ? chartTemperature = drawChart("temperature", dateAndTempetarure, 15, 25)
-            : updateChart(chartTemperature, [...dateAndTempetarure].pop())
+async function fetchData(){
+    await fetchSensor1Data();
+    await fetchSensor2Data();
+}
 
-            chartHumidity == null 
-            ? chartHumidity = drawChart("humidity", dateAndHumidity, 60, 80) 
-            : updateChart(chartHumidity, [...dateAndHumidity].pop())
+async function fetchSensor1Data(){
+    return new Promise(resolve => {
+        fetch('https://data.sensor.community/airrohr/v1/sensor/71551/')
+           .then(r => r.json())
+           .then(response => {
+               addToPreviousData(dateAndTemperature, getDateAndValue(response, "temperature"));
+               addToPreviousData(dateAndHumidity, getDateAndValue(response, "humidity"));
+           }).then(() => resolve('resolved'));
         });
+}
 
-    fetch('https://data.sensor.community/airrohr/v1/sensor/71550/')
+async function fetchSensor2Data(){
+    return new Promise(resolve => {
+        fetch('https://data.sensor.community/airrohr/v1/sensor/71550/')
         .then(r => r.json())
         .then(response => {
             addToPreviousData(dateAndP1, getDateAndValue(response, "P1"));
             addToPreviousData(dateAndP2, getDateAndValue(response, "P2"));
         })
-        .then(() => {
-            chartP1 == null 
-            ? chartP1 = drawChart("P1", dateAndP1, 2, 15)
-            : updateChart(chartP1, [...dateAndP1].pop())
-
-            chartP2 == null 
-            ? chartP2 = drawChart("P2", dateAndP2, 2, 15)
-            : updateChart(chartP2, [...dateAndP2].pop())
+        .then(() => resolve('resolved'));
         });
+}
+
+function updateCharts(){
+    updateChart(chartTemperature, [...dateAndTemperature].pop());
+    updateChart(chartHumidity, [...dateAndHumidity].pop());
+    updateChart(chartP1, [...dateAndP1].pop());
+    updateChart(chartP2, [...dateAndP2].pop());
+}
+
+function drawCharts(){
+    chartTemperature = drawChart("temperature", dateAndTemperature, 0, 25);
+    chartHumidity = drawChart("humidity", dateAndHumidity, 40, 80);
+    chartP1 = drawChart("P1", dateAndP1, 5, 25);
+    chartP2 = drawChart("P2", dateAndP2, 5, 25);
 }
 
 function addToPreviousData(previousData, newData) {
