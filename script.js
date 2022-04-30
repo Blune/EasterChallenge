@@ -16,42 +16,43 @@ async function refreshEvery65Seconds() {
     setTimeout(refreshEvery65Seconds, 65000);
 }
 
-async function fetchData(){
+async function fetchData() {
     await fetchSensor1Data();
     await fetchSensor2Data();
 }
 
-async function fetchSensor1Data(){
+async function fetchSensor1Data() {
     return new Promise(resolve => {
         fetch('https://data.sensor.community/airrohr/v1/sensor/71551/')
-           .then(r => r.json())
-           .then(response => {
-               addToPreviousData(dateAndTemperature, getDateAndValue(response, "temperature"));
-               addToPreviousData(dateAndHumidity, getDateAndValue(response, "humidity"));
-           }).then(() => resolve('resolved'));
-        });
+            .then(r => r.json())
+            .then(response => {
+                addToPreviousData(dateAndTemperature, getDateAndValue(response, "temperature"));
+                addToPreviousData(dateAndHumidity, getDateAndValue(response, "humidity"));
+            }).then(() => resolve('resolved'));
+    });
 }
 
-async function fetchSensor2Data(){
+async function fetchSensor2Data() {
     return new Promise(resolve => {
         fetch('https://data.sensor.community/airrohr/v1/sensor/71550/')
-        .then(r => r.json())
-        .then(response => {
-            addToPreviousData(dateAndP1, getDateAndValue(response, "P1"));
-            addToPreviousData(dateAndP2, getDateAndValue(response, "P2"));
-        })
-        .then(() => resolve('resolved'));
-        });
+            .then(r => r.json())
+            .then(response => {
+                addToPreviousData(dateAndP1, getDateAndValue(response, "P1"));
+                addToPreviousData(dateAndP2, getDateAndValue(response, "P2"));
+            })
+            .then(() => resolve('resolved'));
+    });
 }
 
-function updateCharts(){
+function updateCharts() {
     updateChart(chartTemperature, [...dateAndTemperature].pop());
     updateChart(chartHumidity, [...dateAndHumidity].pop());
     updateChart(chartP1, [...dateAndP1].pop());
     updateChart(chartP2, [...dateAndP2].pop());
 }
 
-function drawCharts(){
+function drawCharts() {
+    removeLoadingScreen();
     chartTemperature = drawChart("temperature", dateAndTemperature, 0, 25);
     chartHumidity = drawChart("humidity", dateAndHumidity, 40, 80);
     chartP1 = drawChart("P1", dateAndP1, 5, 25);
@@ -66,7 +67,7 @@ function getDateAndValue(response, valueName) {
     map = new Map();
     dates = getDates(response);
     data = getSensorData(response, valueName);
-    for (var i = 0; i < dates.length; i++) 
+    for (var i = 0; i < dates.length; i++)
         map.set(dates[i], data[i]);
     return map;
 }
@@ -86,7 +87,7 @@ function getSensorData(response, name) {
         .reverse();
 }
 
-function updateChart(chart, [key, value]){
+function updateChart(chart, [key, value]) {
     chart.data.labels.push(key);
     chart.data.datasets.forEach((dataset) => {
         dataset.data.push(value);
@@ -112,12 +113,19 @@ function drawChart(name, datesAndValues, min, max) {
                     suggestedMin: min,
                     suggestedMax: max
                 }
-            },                
-            plugins:{
+            },
+            plugins: {
                 legend: {
                     display: false
                 }
             }
         }
     });
+}
+
+function removeLoadingScreen() {
+    var loadingOverlay = document.getElementById("loading");
+    loadingOverlay.classList.remove("loading");
+    var loadingWheel = document.getElementById("loadingWheel");
+    loadingWheel.classList.remove("loading-wheel");
 }
